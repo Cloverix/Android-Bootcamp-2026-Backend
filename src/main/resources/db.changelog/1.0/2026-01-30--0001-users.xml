@@ -23,6 +23,7 @@
             </column>
             <column name="patronymic" type="VARCHAR(100)"/>
             <column name="department" type="VARCHAR(255)"/>
+            <column name="photo_url" type="VARCHAR(255)"/>
             <column name="messenger_link" type="VARCHAR(255)">
                 <constraints unique="true"/>
             </column>
