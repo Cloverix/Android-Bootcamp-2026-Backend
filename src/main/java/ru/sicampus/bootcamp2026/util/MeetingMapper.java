@@ -17,23 +17,15 @@ public class MeetingMapper {
         meetingDTO.setDate(meeting.getDate());
         meetingDTO.setStartTime(meeting.getStartTime());
         meetingDTO.setEndTime(meeting.getEndTime());
+        meetingDTO.setCreatorId(meeting.getCreator().getId());
 
-        User creator = meeting.getCreator();
-        meetingDTO.setCreatorSurname(creator.getSurname());
-        meetingDTO.setCreatorName(creator.getName());
-        meetingDTO.setCreatorPatronymic(creator.getPatronymic());
+        List<Long> invitedUsers = new ArrayList<>();
+        meeting.getInvites().forEach(invite -> invitedUsers.add(invite.getInvitedUser().getId()));
+        meetingDTO.setInvitedUserIds(invitedUsers);
 
-        List<User> invitedUsers = new ArrayList<>();
-        List<User> confirmedUsers = new ArrayList<>();
-        meeting.getInvites().forEach(invite -> {
-            User invitedUser = invite.getInvitedUser();
-            invitedUsers.add(invitedUser);
-            if (invite.isAccepted()) {
-                confirmedUsers.add(invitedUser);
-            }
-        });
-        meetingDTO.setInvitedUsers(invitedUsers);
-        meetingDTO.setConfirmedUsers(confirmedUsers);
+        List<Long> confirmedUserIds = new ArrayList<>();
+        meeting.getConfirmedUsers().forEach(user -> confirmedUserIds.add(user.getId()));
+        meetingDTO.setConfirmedUserIds(confirmedUserIds);
         return meetingDTO;
     }
 }

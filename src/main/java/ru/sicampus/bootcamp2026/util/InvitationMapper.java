@@ -9,7 +9,9 @@ public class InvitationMapper {
     public InvitationDTO convertToDto(Invitation invitation) {
         InvitationDTO invitationDTO = new InvitationDTO();
         invitationDTO.setId(invitation.getId());
-        invitationDTO.setMeeting(invitation.getMeeting());
+        invitationDTO.setUserId(invitation.getInvitedUser().getId());
+        invitationDTO.setMeetingId(invitation.getMeeting().getId());
+        invitationDTO.setAccepted(invitation.isAccepted());
         return invitationDTO;
     }
 }

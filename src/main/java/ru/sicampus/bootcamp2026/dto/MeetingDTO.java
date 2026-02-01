@@ -10,13 +10,11 @@ import java.util.List;
 @Data
 public class MeetingDTO {
     private long id;
+    private long creatorId;
     private String title;
     private Date date;
     private Time startTime;
     private Time endTime;
-    private String creatorSurname;
-    private String creatorName;
-    private String creatorPatronymic;
-    private List<User> invitedUsers;
-    private List<User> confirmedUsers;
+    private List<Long> invitedUserIds;      //Ids of invited users
+    private List<Long> confirmedUserIds;    //Ids of users, that accepted the invitation
 }

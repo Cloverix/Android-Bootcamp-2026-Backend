@@ -23,15 +23,17 @@ public class UserMapper {
         userDTO.setPhoneNumber(user.getPhoneNumber());
         userDTO.setPersonalEmail(user.getPersonalEmail());
 
-        List<Meeting> invitedMeetings = new ArrayList<>();
-        for (Invitation invite : user.getInvites()) {
+        List<Long> invitedMeetingIds = new ArrayList<>();
+        user.getInvites().forEach(invite -> {
             if (!invite.isAccepted()) {
-                invitedMeetings.add(invite.getMeeting());
+                invitedMeetingIds.add(invite.getMeeting().getId());
             }
-        }
-        userDTO.setInvitedMeetings(invitedMeetings);
+        });
+        userDTO.setInvitedMeetingIds(invitedMeetingIds);
 
-        userDTO.setPlannedMeetings(user.getPlannedMeetings());
+        List<Long> plannedMeetingIds = new ArrayList<>();
+        user.getPlannedMeetings().forEach(meeting -> plannedMeetingIds.add(meeting.getId()));
+        userDTO.setPlannedMeetingIds(plannedMeetingIds);
         return userDTO;
     }
 }

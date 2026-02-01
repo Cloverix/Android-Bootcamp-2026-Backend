@@ -15,7 +15,7 @@ public class RegisteredUser {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "email", nullable = false)
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @Column(name = "password", nullable = false)
