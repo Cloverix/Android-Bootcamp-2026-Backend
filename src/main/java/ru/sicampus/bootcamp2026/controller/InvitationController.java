@@ -20,6 +20,11 @@ public class InvitationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(invitationService.createInvitation(dto));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<InvitationDTO> getInvitationById(@PathVariable Long id) {
+        return ResponseEntity.ok(invitationService.getInvitationById(id));
+    }
+
     @GetMapping
     public ResponseEntity<List<InvitationDTO>> getAllInvitations() {
         return ResponseEntity.ok(invitationService.getAllInvitations());

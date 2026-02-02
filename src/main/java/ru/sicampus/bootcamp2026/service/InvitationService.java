@@ -7,6 +7,8 @@ import java.util.List;
 public interface InvitationService {
     InvitationDTO createInvitation(InvitationDTO dto);
 
+    InvitationDTO getInvitationById(Long id);
+
     List<InvitationDTO> getAllInvitations();
 
     InvitationDTO updateInvitation(Long id, InvitationDTO dto);

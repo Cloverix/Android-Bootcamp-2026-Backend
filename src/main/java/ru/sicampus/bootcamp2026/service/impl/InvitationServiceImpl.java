@@ -37,6 +37,13 @@ public class InvitationServiceImpl implements InvitationService {
     }
 
     @Override
+    public InvitationDTO getInvitationById(Long id) {
+        return invitationRepository.findById(id)
+                .map(InvitationMapper::convertToDto)
+                .orElseThrow(() -> new InvitationNotFoundException("Invitation not found"));
+    }
+
+    @Override
     public List<InvitationDTO> getAllInvitations() {
         return invitationRepository.findAll().stream()
                 .map(InvitationMapper::convertToDto)

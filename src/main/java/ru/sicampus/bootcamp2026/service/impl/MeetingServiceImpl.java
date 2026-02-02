@@ -65,6 +65,13 @@ public class MeetingServiceImpl implements MeetingService {
     }
 
     @Override
+    public MeetingDTO getMeetingById(Long id) {
+        return meetingRepository.findById(id)
+                .map(MeetingMapper::convertToDto)
+                .orElseThrow(() -> new MeetingNotFoundException("Meeting not found"));
+    }
+
+    @Override
     public List<MeetingDTO> getAllMeetings() {
         return meetingRepository.findAll().stream()
                 .map(MeetingMapper::convertToDto)
@@ -80,15 +87,27 @@ public class MeetingServiceImpl implements MeetingService {
 
     @Override
     public List<MeetingDTO> getAllMeetingsByInvitedUserId(Long id) {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isEmpty()) {
-            throw new UserNotFoundException("User not found");
-        }
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        List<Invitation> invites = invitationRepository.findAllByInvitedUser(user.get());
+        List<Invitation> invites = invitationRepository.findAllByInvitedUser(user);
         List<MeetingDTO> meetings = new ArrayList<>();
         invites.forEach(invite -> {
             if (!invite.isAccepted()) {
+                meetings.add(MeetingMapper.convertToDto(invite.getMeeting()));
+            }
+        });
+
+        return meetings;
+    }
+
+    @Override
+    public List<MeetingDTO> getAllPlannedMeetingsByUserId(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        List<Invitation> invites = invitationRepository.findAllByInvitedUser(user);
+        List<MeetingDTO> meetings = new ArrayList<>();
+        invites.forEach(invite -> {
+            if (invite.isAccepted()) {
                 meetings.add(MeetingMapper.convertToDto(invite.getMeeting()));
             }
         });

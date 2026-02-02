@@ -20,12 +20,17 @@ public class MeetingController {
         return ResponseEntity.status(HttpStatus.CREATED).body(meetingService.createMeeting(dto));
     }
 
+    @GetMapping("/id={id}")
+    public ResponseEntity<MeetingDTO> getMeetingById(@PathVariable Long id) {
+        return ResponseEntity.ok(meetingService.getMeetingById(id));
+    }
+
     @GetMapping
     public ResponseEntity<List<MeetingDTO>> getAllMeetings() {
         return ResponseEntity.ok(meetingService.getAllMeetings());
     }
 
-    @GetMapping("/{title}")
+    @GetMapping("/title={title}")
     public ResponseEntity<List<MeetingDTO>> getAllMeetingsByTitle(@PathVariable String title) {
         return ResponseEntity.ok(meetingService.getAllMeetingsByTitle(title));
     }
@@ -33,6 +38,11 @@ public class MeetingController {
     @GetMapping("/invited/{id}")
     public ResponseEntity<List<MeetingDTO>> getAllMeetingsByInvitedUserId(@PathVariable Long id) {
         return ResponseEntity.ok(meetingService.getAllMeetingsByInvitedUserId(id));
+    }
+
+    @GetMapping("/planned/{id}")
+    public ResponseEntity<List<MeetingDTO>> getAllPlannedMeetingsByUserId(@PathVariable Long id) {
+        return ResponseEntity.ok(meetingService.getAllPlannedMeetingsByUserId(id));
     }
 
     @PutMapping("/{id}")
