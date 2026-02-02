@@ -103,9 +103,13 @@ public class MeetingServiceImpl implements MeetingService {
     @Override
     public List<MeetingDTO> getAllPlannedMeetingsByUserId(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
+        Meeting thisMeeting = meetingRepository.findById(id).orElseThrow(() -> new MeetingNotFoundException("Meeting not found"));
 
         List<Invitation> invites = invitationRepository.findAllByInvitedUser(user);
         List<MeetingDTO> meetings = new ArrayList<>();
+        if (thisMeeting.getCreator() == user) {
+            meetings.add(MeetingMapper.convertToDto(thisMeeting));
+        }
         invites.forEach(invite -> {
             if (invite.isAccepted()) {
                 meetings.add(MeetingMapper.convertToDto(invite.getMeeting()));

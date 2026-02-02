@@ -89,14 +89,16 @@ public class UserServiceImpl implements UserService {
 
         List<Invitation> invitations = new ArrayList<>();
         List<Long> invitedMeetingIds = dto.getInvitedMeetingIds();
-        invitedMeetingIds.forEach(id -> {
-            Meeting meeting = meetingRepository.findById(id).orElseThrow(() -> new MeetingNotFoundException("Meeting not found"));
-            Invitation newInvitation = new Invitation();
-            newInvitation.setInvitedUser(savedUser);
-            newInvitation.setMeeting(meeting);
-            newInvitation.setAccepted(false);
-            invitations.add(newInvitation);
-        });
+        if (!(invitedMeetingIds == null)) {
+            invitedMeetingIds.forEach(id -> {
+                Meeting meeting = meetingRepository.findById(id).orElseThrow(() -> new MeetingNotFoundException("Meeting not found"));
+                Invitation newInvitation = new Invitation();
+                newInvitation.setInvitedUser(savedUser);
+                newInvitation.setMeeting(meeting);
+                newInvitation.setAccepted(false);
+                invitations.add(newInvitation);
+            });
+        }
 
         savedUser.getInvites().addAll(invitations);
 
@@ -118,14 +120,16 @@ public class UserServiceImpl implements UserService {
 
         List<Invitation> updatedInvitations = new ArrayList<>();
         List<Long> updatedInvitedMeetingIds = dto.getInvitedMeetingIds();
-        updatedInvitedMeetingIds.forEach(meetingId -> {
-            Meeting meeting = meetingRepository.findById(meetingId).orElseThrow(() -> new MeetingNotFoundException("Meeting not found"));
-            Invitation newInvitation = new Invitation();
-            newInvitation.setInvitedUser(user);
-            newInvitation.setMeeting(meeting);
-            newInvitation.setAccepted(false);
-            updatedInvitations.add(newInvitation);
-        });
+        if (!(updatedInvitedMeetingIds == null)) {
+            updatedInvitedMeetingIds.forEach(meetingId -> {
+                Meeting meeting = meetingRepository.findById(meetingId).orElseThrow(() -> new MeetingNotFoundException("Meeting not found"));
+                Invitation newInvitation = new Invitation();
+                newInvitation.setInvitedUser(user);
+                newInvitation.setMeeting(meeting);
+                newInvitation.setAccepted(false);
+                updatedInvitations.add(newInvitation);
+            });
+        }
 
         user.getInvites().clear();
         user.getInvites().addAll(updatedInvitations);
