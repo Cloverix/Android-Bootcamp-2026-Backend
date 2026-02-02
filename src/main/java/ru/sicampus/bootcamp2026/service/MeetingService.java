@@ -13,8 +13,6 @@ public interface MeetingService {
 
     List<MeetingDTO> getAllMeetingsByInvitedUserId(Long id);
 
-    List<MeetingDTO> getAllMeetingsByConfirmedUserId(Long id);
-
     MeetingDTO updateMeeting(Long id, MeetingDTO dto);
 
     void deleteMeeting(Long id);

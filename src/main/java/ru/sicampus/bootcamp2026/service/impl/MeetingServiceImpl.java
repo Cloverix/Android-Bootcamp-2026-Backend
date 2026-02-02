@@ -2,6 +2,7 @@ package ru.sicampus.bootcamp2026.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.sicampus.bootcamp2026.dto.InvitationDTO;
 import ru.sicampus.bootcamp2026.dto.MeetingDTO;
 import ru.sicampus.bootcamp2026.entity.Invitation;
 import ru.sicampus.bootcamp2026.entity.Meeting;
@@ -44,29 +45,23 @@ public class MeetingServiceImpl implements MeetingService {
         meeting.setStartTime(dto.getStartTime());
         meeting.setEndTime(dto.getEndTime());
 
+        meeting.setInvites(new ArrayList<>());
+
+        Meeting savedMeeting = meetingRepository.save(meeting);
+
         List<Invitation> invitations = new ArrayList<>();
-        List<Long> inviteIds = dto.getInvitedUserIds();
-        inviteIds.forEach(id -> {
-            Optional<Invitation> invitation = invitationRepository.findById(id);
-            if (invitation.isEmpty()) {
-                throw new InvitationNotFoundException("Invitation not found");
-            }
-            invitations.add(invitation.get());
+        List<Long> invitedUserIds = dto.getInvitedUserIds();
+        invitedUserIds.forEach(id -> {
+            Invitation newInvitation = new Invitation();
+            newInvitation.setInvitedUser(userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found")));
+            newInvitation.setMeeting(savedMeeting);
+            newInvitation.setAccepted(false);
+            invitations.add(newInvitation);
         });
-        meeting.setInvites(invitations);
 
-        List<User> confirmedUsers = new ArrayList<>();
-        List<Long> confirmedIds = dto.getConfirmedUserIds();
-        confirmedIds.forEach(id -> {
-            Optional<User> user = userRepository.findById(id);
-            if (user.isEmpty()) {
-                throw new UserNotFoundException("User not found");
-            }
-            confirmedUsers.add(user.get());
-        });
-        meeting.setConfirmedUsers(confirmedUsers);
+        savedMeeting.getInvites().addAll(invitations);
 
-        return MeetingMapper.convertToDto(meetingRepository.save(meeting));
+        return MeetingMapper.convertToDto(meetingRepository.save(savedMeeting));
     }
 
     @Override
@@ -102,46 +97,33 @@ public class MeetingServiceImpl implements MeetingService {
     }
 
     @Override
-    public List<MeetingDTO> getAllMeetingsByConfirmedUserId(Long id) {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isEmpty()) {
-            throw new UserNotFoundException("User not found");
-        }
-
-        List<Meeting> allMeetings = meetingRepository.findAll();
-        List<MeetingDTO> meetingDTOS = new ArrayList<>();
-        allMeetings.forEach(meeting -> {
-            if (meeting.getConfirmedUsers().contains(user.get())) {
-                meetingDTOS.add(MeetingMapper.convertToDto(meeting));
-            }
-        });
-
-        return meetingDTOS;
-    }
-
-    @Override
     public MeetingDTO updateMeeting(Long id, MeetingDTO dto) {
         Meeting meeting = meetingRepository.findById(id).orElseThrow(() -> new MeetingNotFoundException("Meeting not found"));
 
-        User creator = userRepository.findById(dto.getCreatorId()).orElseThrow(() -> new UserNotFoundException("User not found"));
-        meeting.setCreator(creator);
+        Optional<User> creator = userRepository.findById(dto.getCreatorId());
+        if (creator.isEmpty()) {
+            throw new UserNotFoundException("User not found");
+        }
+        meeting.setCreator(creator.get());
 
         meeting.setTitle(dto.getTitle());
         meeting.setDate(dto.getDate());
         meeting.setStartTime(dto.getStartTime());
         meeting.setEndTime(dto.getEndTime());
 
-        List<Invitation> invites = new ArrayList<>();
-        dto.getInvitedUserIds().forEach(inviteId -> {
-            invites.add(invitationRepository.findById(inviteId).orElseThrow(() -> new InvitationNotFoundException("Invitation not found")));
+        List<Invitation> invitations = new ArrayList<>();
+        List<Long> updatedInvitedUserIds = dto.getInvitedUserIds();
+        updatedInvitedUserIds.forEach(userId -> {
+            User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
+            Invitation newInvitation = new Invitation();
+            newInvitation.setInvitedUser(user);
+            newInvitation.setMeeting(meeting);
+            newInvitation.setAccepted(false);
+            invitations.add(newInvitation);
         });
-        meeting.setInvites(invites);
 
-        List<User> confirmedUsers = new ArrayList<>();
-        dto.getConfirmedUserIds().forEach(confirmedId -> {
-            confirmedUsers.add(userRepository.findById(confirmedId).orElseThrow(() -> new UserNotFoundException("User not found")));
-        });
-        meeting.setConfirmedUsers(confirmedUsers);
+        meeting.getInvites().clear();
+        meeting.getInvites().addAll(invitations);
 
         return MeetingMapper.convertToDto(meetingRepository.save(meeting));
     }

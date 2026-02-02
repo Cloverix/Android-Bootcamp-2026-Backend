@@ -31,12 +31,6 @@ public class Meeting {
     @Column(name = "end_time", nullable = false)
     private Time endTime;
 
-    @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Invitation> invites;
-
-    @ManyToMany
-    @JoinTable(name = "planned_meetings",
-            joinColumns = @JoinColumn(name = "meeting_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private List<User> confirmedUsers;       //Users which have accepted invites
 }

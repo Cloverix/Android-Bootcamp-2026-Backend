@@ -4,12 +4,20 @@ package ru.sicampus.bootcamp2026.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.sicampus.bootcamp2026.dto.UserDTO;
+import ru.sicampus.bootcamp2026.entity.Invitation;
+import ru.sicampus.bootcamp2026.entity.Meeting;
 import ru.sicampus.bootcamp2026.entity.User;
+import ru.sicampus.bootcamp2026.exception.InvitationNotFoundException;
+import ru.sicampus.bootcamp2026.exception.MeetingNotFoundException;
 import ru.sicampus.bootcamp2026.exception.UserNotFoundException;
+import ru.sicampus.bootcamp2026.repository.InvitationRepository;
+import ru.sicampus.bootcamp2026.repository.MeetingRepository;
 import ru.sicampus.bootcamp2026.repository.UserRepository;
 import ru.sicampus.bootcamp2026.service.UserService;
 import ru.sicampus.bootcamp2026.util.UserMapper;
 
+import java.util.ArrayList;
+import java.util.EmptyStackException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,6 +26,8 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final MeetingRepository meetingRepository;
+    private final InvitationRepository invitationRepository;
 
     @Override
     public List<UserDTO> getAllUsers() {
@@ -73,7 +83,24 @@ public class UserServiceImpl implements UserService {
         user.setPhoneNumber(dto.getPhoneNumber());
         user.setPersonalEmail(dto.getPersonalEmail());
 
-        return UserMapper.convertToDto(userRepository.save(user));
+        user.setInvites(new ArrayList<>());
+
+        User savedUser = userRepository.save(user);
+
+        List<Invitation> invitations = new ArrayList<>();
+        List<Long> invitedMeetingIds = dto.getInvitedMeetingIds();
+        invitedMeetingIds.forEach(id -> {
+            Meeting meeting = meetingRepository.findById(id).orElseThrow(() -> new MeetingNotFoundException("Meeting not found"));
+            Invitation newInvitation = new Invitation();
+            newInvitation.setInvitedUser(savedUser);
+            newInvitation.setMeeting(meeting);
+            newInvitation.setAccepted(false);
+            invitations.add(newInvitation);
+        });
+
+        savedUser.getInvites().addAll(invitations);
+
+        return UserMapper.convertToDto(userRepository.save(savedUser));
     }
 
     @Override
@@ -88,6 +115,20 @@ public class UserServiceImpl implements UserService {
         user.setMessengerLink(dto.getMessengerLink());
         user.setPhoneNumber(dto.getPhoneNumber());
         user.setPersonalEmail(dto.getPersonalEmail());
+
+        List<Invitation> updatedInvitations = new ArrayList<>();
+        List<Long> updatedInvitedMeetingIds = dto.getInvitedMeetingIds();
+        updatedInvitedMeetingIds.forEach(meetingId -> {
+            Meeting meeting = meetingRepository.findById(meetingId).orElseThrow(() -> new MeetingNotFoundException("Meeting not found"));
+            Invitation newInvitation = new Invitation();
+            newInvitation.setInvitedUser(user);
+            newInvitation.setMeeting(meeting);
+            newInvitation.setAccepted(false);
+            updatedInvitations.add(newInvitation);
+        });
+
+        user.getInvites().clear();
+        user.getInvites().addAll(updatedInvitations);
 
         return UserMapper.convertToDto(userRepository.save(user));
     }

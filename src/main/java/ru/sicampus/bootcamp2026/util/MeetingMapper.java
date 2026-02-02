@@ -23,9 +23,6 @@ public class MeetingMapper {
         meeting.getInvites().forEach(invite -> invitedUsers.add(invite.getInvitedUser().getId()));
         meetingDTO.setInvitedUserIds(invitedUsers);
 
-        List<Long> confirmedUserIds = new ArrayList<>();
-        meeting.getConfirmedUsers().forEach(user -> confirmedUserIds.add(user.getId()));
-        meetingDTO.setConfirmedUserIds(confirmedUserIds);
         return meetingDTO;
     }
 }

@@ -43,9 +43,6 @@ public class User {
     @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL)
     private List<Meeting> createdMeetings;
 
-    @OneToMany(mappedBy = "invitedUser", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "invitedUser", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Invitation> invites;
-
-    @ManyToMany(mappedBy = "confirmedUsers")
-    private List<Meeting> plannedMeetings;
 }

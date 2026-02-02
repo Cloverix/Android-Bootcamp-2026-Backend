@@ -31,9 +31,6 @@ public class UserMapper {
         });
         userDTO.setInvitedMeetingIds(invitedMeetingIds);
 
-        List<Long> plannedMeetingIds = new ArrayList<>();
-        user.getPlannedMeetings().forEach(meeting -> plannedMeetingIds.add(meeting.getId()));
-        userDTO.setPlannedMeetingIds(plannedMeetingIds);
         return userDTO;
     }
 }

@@ -16,5 +16,4 @@ public class MeetingDTO {
     private Time startTime;
     private Time endTime;
     private List<Long> invitedUserIds;      //Ids of invited users
-    private List<Long> confirmedUserIds;    //Ids of users, that accepted the invitation
 }

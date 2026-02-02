@@ -35,11 +35,6 @@ public class MeetingController {
         return ResponseEntity.ok(meetingService.getAllMeetingsByInvitedUserId(id));
     }
 
-    @GetMapping("/confirmed/{id}")
-    public ResponseEntity<List<MeetingDTO>> getAllMeetingsByConfirmedUserId(@PathVariable Long id) {
-        return ResponseEntity.ok(meetingService.getAllMeetingsByConfirmedUserId(id));
-    }
-
     @PutMapping("/{id}")
     public ResponseEntity<MeetingDTO> updateMeeting(@PathVariable Long id, @RequestBody MeetingDTO dto) {
         return ResponseEntity.ok(meetingService.updateMeeting(id, dto));

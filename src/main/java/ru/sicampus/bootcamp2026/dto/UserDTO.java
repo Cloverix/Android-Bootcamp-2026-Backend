@@ -18,5 +18,4 @@ public class UserDTO {
     private String phoneNumber;
     private String personalEmail;
     private List<Long> invitedMeetingIds;      //Ids of meetings to which the user is invited
-    private List<Long> plannedMeetingIds;   //Ids of planned meetings
 }
