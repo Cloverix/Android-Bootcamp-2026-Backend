@@ -1,5 +1,6 @@
 package ru.sicampus.bootcamp2026.service;
 
+import ru.sicampus.bootcamp2026.dto.UserRegisterDTO;
 import ru.sicampus.bootcamp2026.dto.UserDTO;
 
 import java.util.List;
@@ -9,6 +10,8 @@ public interface UserService {
 
     UserDTO getUserById(Long id);
 
+    UserDTO getUserByUsername(String username);
+
     List<UserDTO> getAllUsersBySurname(String surname);
 
     List<UserDTO> getAllUsersByName(String name);
@@ -17,7 +20,7 @@ public interface UserService {
 
     List<UserDTO> getAllUsersByDepartmentName(String departmentName);
 
-    UserDTO createUser(UserDTO dto);
+    UserDTO createUser(UserRegisterDTO dto);
 
     UserDTO updateUser(Long id, UserDTO dto);
 

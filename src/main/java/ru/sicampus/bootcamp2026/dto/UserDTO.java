@@ -9,6 +9,7 @@ import java.util.List;
 @Data
 public class UserDTO {
     private long id;
+    private String username;
     private String surname;
     private String name;
     private String patronymic;

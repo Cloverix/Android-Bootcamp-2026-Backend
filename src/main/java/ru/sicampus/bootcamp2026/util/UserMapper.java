@@ -13,6 +13,7 @@ import java.util.List;
 public class UserMapper {
     public UserDTO convertToDto(User user) {
         UserDTO userDTO = new UserDTO();
+        userDTO.setUsername(user.getUsername());
         userDTO.setId(user.getId());
         userDTO.setSurname(user.getSurname());
         userDTO.setName(user.getName());

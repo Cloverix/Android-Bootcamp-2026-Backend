@@ -15,12 +15,8 @@
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="surname" type="VARCHAR(100)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="name" type="VARCHAR(100)">
-                <constraints nullable="false"/>
-            </column>
+            <column name="surname" type="VARCHAR(100)"/>
+            <column name="name" type="VARCHAR(100)"/>
             <column name="patronymic" type="VARCHAR(100)"/>
             <column name="department" type="VARCHAR(255)"/>
             <column name="photo_url" type="VARCHAR(255)"/>
@@ -34,6 +30,36 @@
                 <constraints unique="true"/>
             </column>
         </createTable>
+    </changeSet>
+    
+    <changeSet id="2026-02-03--0001-username" author="aefremenko">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="users"/>
+            <not>
+                <columnExists tableName="users" columnName="username"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="users">
+            <column name="username" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="2026-02-03--0001-password" author="aefremenko">
+        <preConditions>
+            <tableExists tableName="users"/>
+            <not>
+                <columnExists tableName="users" columnName="password"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="users">
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
     </changeSet>
 
 </databaseChangeLog>

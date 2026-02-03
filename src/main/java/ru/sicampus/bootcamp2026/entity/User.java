@@ -2,21 +2,30 @@ package ru.sicampus.bootcamp2026.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "surname", nullable = false)
+    @Column(name = "username", nullable = false, unique = true)
+    private String username;
+
+    @Column(name = "password", nullable = false)
+    private String password;
+
+    @Column(name = "surname")
     private String surname;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name")
     private String name;
 
     @Column(name = "patronymic")
@@ -37,12 +46,12 @@ public class User {
     @Column(name = "personal_email", unique = true)
     private String personalEmail;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private RegisteredUser registrationData;
-
     @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Meeting> createdMeetings;
 
     @OneToMany(mappedBy = "invitedUser", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Invitation> invites;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<Authority> authorities;
 }

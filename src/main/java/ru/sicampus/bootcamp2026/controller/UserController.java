@@ -3,9 +3,12 @@ package ru.sicampus.bootcamp2026.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import ru.sicampus.bootcamp2026.dto.UserRegisterDTO;
 import ru.sicampus.bootcamp2026.dto.UserDTO;
 import ru.sicampus.bootcamp2026.service.UserService;
+import ru.sicampus.bootcamp2026.util.UserMapper;
 
 import java.util.List;
 
@@ -15,6 +18,11 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
 
+    @GetMapping("/login")
+    public ResponseEntity<UserDTO> login(Authentication authentication) {
+        return ResponseEntity.ok(userService.getUserByUsername(authentication.getName()));
+    }
+
     @GetMapping
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
@@ -23,6 +31,12 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
+    }
+
+    @GetMapping("/username={username}")
+    public ResponseEntity<String> getByUsername(@PathVariable String username) {
+        UserDTO userDTO = userService.getUserByUsername(username);
+        return ResponseEntity.ok("User with username " + username + " is registered");
     }
 
     @GetMapping("/surname={surname}")
@@ -45,8 +59,8 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsersByDepartmentName(departmentName));
     }
 
-    @PostMapping
-    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO dto) {
+    @PostMapping("/register")
+    public ResponseEntity<UserDTO> createUser(@RequestBody UserRegisterDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(dto));
     }
 

@@ -4,27 +4,19 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
-    <changeSet id="2026-01-30--0002-registered_users" author="aefremenko">
+    <changeSet id="2026-02-03--0002-authorities" author="aefremenko">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="registered_users"/>
+                <tableExists tableName="authorities"/>
             </not>
         </preConditions>
 
-        <createTable tableName="registered_users">
+        <createTable tableName="authorities">
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="user_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="fk_registered_users_users"
-                             referencedTableName="users"
-                             referencedColumnNames="id"/>
-            </column>
-            <column name="email" type="VARCHAR(255)">
+            <column name="authority" type="VARCHAR(255)">
                 <constraints nullable="false" unique="true"/>
-            </column>
-            <column name="password" type="VARCHAR(255)">
-                <constraints nullable="false"/>
             </column>
         </createTable>
     </changeSet>
