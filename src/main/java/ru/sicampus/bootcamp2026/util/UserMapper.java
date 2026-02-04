@@ -2,8 +2,6 @@ package ru.sicampus.bootcamp2026.util;
 
 import lombok.experimental.UtilityClass;
 import ru.sicampus.bootcamp2026.dto.UserDTO;
-import ru.sicampus.bootcamp2026.entity.Invitation;
-import ru.sicampus.bootcamp2026.entity.Meeting;
 import ru.sicampus.bootcamp2026.entity.User;
 
 import java.util.ArrayList;
@@ -22,7 +20,7 @@ public class UserMapper {
         userDTO.setPhotoUrl(user.getPhotoUrl());
         userDTO.setMessengerLink(user.getMessengerLink());
         userDTO.setPhoneNumber(user.getPhoneNumber());
-        userDTO.setPersonalEmail(user.getPersonalEmail());
+        userDTO.setEmail(user.getEmail());
 
         List<Long> invitedMeetingIds = new ArrayList<>();
         user.getInvites().forEach(invite -> {

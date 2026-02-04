@@ -3,7 +3,6 @@ package ru.sicampus.bootcamp2026.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.List;
 import java.util.Set;
@@ -43,8 +42,8 @@ public class User implements UserDetails {
     @Column(name = "phone_number", unique = true)
     private String phoneNumber;
 
-    @Column(name = "personal_email", unique = true)
-    private String personalEmail;
+    @Column(name = "email", unique = true)
+    private String Email;
 
     @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Meeting> createdMeetings;

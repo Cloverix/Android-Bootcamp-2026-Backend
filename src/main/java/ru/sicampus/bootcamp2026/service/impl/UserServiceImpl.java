@@ -14,7 +14,6 @@ import ru.sicampus.bootcamp2026.exception.MeetingNotFoundException;
 import ru.sicampus.bootcamp2026.exception.UserAlreadyExistsException;
 import ru.sicampus.bootcamp2026.exception.UserNotFoundException;
 import ru.sicampus.bootcamp2026.repository.AuthorityRepository;
-import ru.sicampus.bootcamp2026.repository.InvitationRepository;
 import ru.sicampus.bootcamp2026.repository.MeetingRepository;
 import ru.sicampus.bootcamp2026.repository.UserRepository;
 import ru.sicampus.bootcamp2026.service.UserService;
@@ -111,7 +110,7 @@ public class UserServiceImpl implements UserService {
         user.setPhotoUrl(dto.getPhotoUrl());
         user.setMessengerLink(dto.getMessengerLink());
         user.setPhoneNumber(dto.getPhoneNumber());
-        user.setPersonalEmail(dto.getPersonalEmail());
+        user.setEmail(dto.getEmail());
 
         List<Invitation> updatedInvitations = new ArrayList<>();
         List<Long> updatedInvitedMeetingIds = dto.getInvitedMeetingIds();

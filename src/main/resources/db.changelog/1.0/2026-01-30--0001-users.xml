@@ -26,7 +26,7 @@
             <column name="phone_number" type="VARCHAR(255)">
                 <constraints unique="true"/>
             </column>
-            <column name="personal_email" type="VARCHAR(255)">
+            <column name="email" type="VARCHAR(255)">
                 <constraints unique="true"/>
             </column>
         </createTable>

@@ -1,8 +1,6 @@
 package ru.sicampus.bootcamp2026.dto;
 
 import lombok.Data;
-import ru.sicampus.bootcamp2026.entity.Invitation;
-import ru.sicampus.bootcamp2026.entity.Meeting;
 
 import java.util.List;
 
@@ -17,6 +15,6 @@ public class UserDTO {
     private String photoUrl;
     private String messengerLink;
     private String phoneNumber;
-    private String personalEmail;
+    private String Email;
     private List<Long> invitedMeetingIds;      //Ids of meetings to which the user is invited
 }
