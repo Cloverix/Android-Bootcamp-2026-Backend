@@ -1,5 +1,7 @@
 package ru.sicampus.bootcamp2026.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import ru.sicampus.bootcamp2026.dto.UserRegisterDTO;
 import ru.sicampus.bootcamp2026.dto.UserDTO;
 
@@ -7,6 +9,8 @@ import java.util.List;
 
 public interface UserService {
     List<UserDTO> getAllUsers();
+
+    Page<UserDTO> getAllUsersPaginated(Pageable pageable);
 
     UserDTO getUserById(Long id);
 

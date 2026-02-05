@@ -1,6 +1,10 @@
 package ru.sicampus.bootcamp2026.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +32,15 @@ public class MeetingController {
     @GetMapping
     public ResponseEntity<List<MeetingDTO>> getAllMeetings() {
         return ResponseEntity.ok(meetingService.getAllMeetings());
+    }
+
+    @GetMapping("/paginated")
+    public ResponseEntity<Page<MeetingDTO>> getAllMeetingsPaginated(
+            @RequestParam(defaultValue = "0") int pageNumber,
+            @RequestParam(defaultValue = "5") int pageSize
+    ) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("date", "startTime"));
+        return ResponseEntity.ok(meetingService.getAllMeetingsPaginated(pageable));
     }
 
     @GetMapping("/title={title}")

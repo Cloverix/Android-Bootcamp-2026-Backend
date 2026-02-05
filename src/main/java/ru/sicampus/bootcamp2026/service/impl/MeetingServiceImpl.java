@@ -1,6 +1,8 @@
 package ru.sicampus.bootcamp2026.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.sicampus.bootcamp2026.dto.InvitationDTO;
 import ru.sicampus.bootcamp2026.dto.MeetingDTO;
@@ -76,6 +78,11 @@ public class MeetingServiceImpl implements MeetingService {
         return meetingRepository.findAll().stream()
                 .map(MeetingMapper::convertToDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<MeetingDTO> getAllMeetingsPaginated(Pageable pageable) {
+        return meetingRepository.findAll(pageable).map(MeetingMapper::convertToDto);
     }
 
     @Override

@@ -2,6 +2,8 @@ package ru.sicampus.bootcamp2026.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
@@ -45,9 +47,11 @@ public class User implements UserDetails {
     @Column(name = "email", unique = true)
     private String Email;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Meeting> createdMeetings;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "invitedUser", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Invitation> invites;
 
