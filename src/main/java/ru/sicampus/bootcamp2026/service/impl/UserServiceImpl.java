@@ -22,6 +22,7 @@ import ru.sicampus.bootcamp2026.service.UserService;
 import ru.sicampus.bootcamp2026.util.UserMapper;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -118,6 +119,54 @@ public class UserServiceImpl implements UserService {
         user.setMessengerLink(dto.getMessengerLink());
         user.setPhoneNumber(dto.getPhoneNumber());
         user.setEmail(dto.getEmail());
+
+        List<Invitation> updatedInvitations = new ArrayList<>();
+        List<Long> updatedInvitedMeetingIds = dto.getInvitedMeetingIds();
+        if (!(updatedInvitedMeetingIds == null)) {
+            updatedInvitedMeetingIds.forEach(meetingId -> {
+                Meeting meeting = meetingRepository.findById(meetingId).orElseThrow(() -> new MeetingNotFoundException("Meeting not found"));
+                Invitation newInvitation = new Invitation();
+                newInvitation.setInvitedUser(user);
+                newInvitation.setMeeting(meeting);
+                newInvitation.setAccepted(false);
+                updatedInvitations.add(newInvitation);
+            });
+        }
+
+        user.getInvites().clear();
+        user.getInvites().addAll(updatedInvitations);
+
+        return UserMapper.convertToDto(userRepository.save(user));
+    }
+
+    @Override
+    public UserDTO patchUser(Long id, UserDTO dto) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        if (dto.getSurname() != null) {
+            user.setSurname(dto.getSurname());
+        }
+        if (dto.getName() != null) {
+            user.setName(dto.getName());
+        }
+        if (dto.getPatronymic() != null) {
+            user.setPatronymic(dto.getPatronymic());
+        }
+        if (dto.getDepartmentName() != null) {
+            user.setDepartmentName(dto.getDepartmentName());
+        }
+        if (dto.getPhotoUrl() != null) {
+            user.setPhotoUrl(dto.getPhotoUrl());
+        }
+        if (dto.getMessengerLink() != null) {
+            user.setMessengerLink(dto.getMessengerLink());
+        }
+        if (dto.getPhoneNumber() != null) {
+            user.setPhoneNumber(dto.getPhoneNumber());
+        }
+        if (dto.getEmail() != null) {
+            user.setEmail(dto.getEmail());
+        }
 
         List<Invitation> updatedInvitations = new ArrayList<>();
         List<Long> updatedInvitedMeetingIds = dto.getInvitedMeetingIds();

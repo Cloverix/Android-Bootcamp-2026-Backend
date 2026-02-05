@@ -62,4 +62,43 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="2026-02-05--0001-surname-index" author="aefremenko">
+        <preConditions>
+            <columnExists tableName="users" columnName="surname"/>
+            <not>
+                <indexExists tableName="users" columnNames="surname"/>
+            </not>
+        </preConditions>
+
+        <createIndex tableName="users" indexName="idx_users_surname">
+            <column name="surname"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="2026-02-05--0001-name-index" author="aefremenko">
+        <preConditions>
+            <columnExists tableName="users" columnName="name"/>
+            <not>
+                <indexExists tableName="users" columnNames="name"/>
+            </not>
+        </preConditions>
+
+        <createIndex tableName="users" indexName="idx_users_name">
+            <column name="name"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="2026-02-05--0001--patronymic-index" author="aefremenko">
+        <preConditions>
+            <columnExists tableName="users" columnName="patronymic"/>
+            <not>
+                <indexExists tableName="users" columnNames="patronymic"/>
+            </not>
+        </preConditions>
+
+        <createIndex tableName="users" indexName="idx_users_patronymic">
+            <column name="patronymic"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>
