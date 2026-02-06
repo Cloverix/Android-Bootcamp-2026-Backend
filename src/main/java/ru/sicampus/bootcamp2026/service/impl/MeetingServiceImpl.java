@@ -2,6 +2,8 @@ package ru.sicampus.bootcamp2026.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.sicampus.bootcamp2026.dto.InvitationDTO;
@@ -108,22 +110,52 @@ public class MeetingServiceImpl implements MeetingService {
     }
 
     @Override
-    public List<MeetingDTO> getAllPlannedMeetingsByUserId(Long id) {
+    public Page<MeetingDTO> getAllMeetingsByInvitedUserIdPaginated(Long id, Pageable pageable) {
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
-        Meeting thisMeeting = meetingRepository.findById(id).orElseThrow(() -> new MeetingNotFoundException("Meeting not found"));
 
         List<Invitation> invites = invitationRepository.findAllByInvitedUser(user);
         List<MeetingDTO> meetings = new ArrayList<>();
-        if (thisMeeting.getCreator() == user) {
-            meetings.add(MeetingMapper.convertToDto(thisMeeting));
-        }
         invites.forEach(invite -> {
-            if (invite.isAccepted()) {
+            if (!invite.isAccepted()) {
                 meetings.add(MeetingMapper.convertToDto(invite.getMeeting()));
             }
         });
 
-        return meetings;
+        return new PageImpl<>(meetings, pageable, meetings.size());
+    }
+
+    @Override
+    public List<MeetingDTO> getAllPlannedMeetingsByUserId(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
+        List<MeetingDTO> plannedMeetings = meetingRepository.findAllByCreator(user).stream()
+                .map(MeetingMapper::convertToDto)
+                .collect(Collectors.toList());
+
+        List<Invitation> invites = invitationRepository.findAllByInvitedUser(user);
+        invites.forEach(invite -> {
+            if (invite.isAccepted()) {
+                plannedMeetings.add(MeetingMapper.convertToDto(invite.getMeeting()));
+            }
+        });
+
+        return plannedMeetings;
+    }
+
+    @Override
+    public Page<MeetingDTO> getAllPlannedMeetingsByUserIdPaginated(Long id, Pageable pageable) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
+        List<MeetingDTO> plannedMeetings = meetingRepository.findAllByCreator(user).stream()
+                .map(MeetingMapper::convertToDto)
+                .collect(Collectors.toList());
+
+        List<Invitation> invites = invitationRepository.findAllByInvitedUser(user);
+        invites.forEach(invite -> {
+            if (invite.isAccepted()) {
+                plannedMeetings.add(MeetingMapper.convertToDto(invite.getMeeting()));
+            }
+        });
+
+        return new PageImpl<>(plannedMeetings, pageable, plannedMeetings.size());
     }
 
     @Override

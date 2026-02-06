@@ -15,7 +15,13 @@ public interface InvitationService {
 
     Page<InvitationDTO> getAllInvitationsPaginated(Pageable pageable);
 
+    List<InvitationDTO> getAllInvitationsByUserId(Long id);
+
+    Page<InvitationDTO> getAllInvitationsByUserIdPaginated(Long id, Pageable pageable);
+
     InvitationDTO updateInvitation(Long id, InvitationDTO dto);
+
+    InvitationDTO confirmInvitation(InvitationDTO dto);
 
     void deleteInvitation(Long id);
 }

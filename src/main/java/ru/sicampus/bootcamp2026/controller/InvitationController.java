@@ -42,9 +42,29 @@ public class InvitationController {
         return ResponseEntity.ok(invitationService.getAllInvitationsPaginated(pageable));
     }
 
+    @GetMapping("/userId={userId}")
+    public ResponseEntity<List<InvitationDTO>> getAllInvitationsByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(invitationService.getAllInvitationsByUserId(userId));
+    }
+
+    @GetMapping("/paginated/userId={userId}")
+    public ResponseEntity<Page<InvitationDTO>> getAllInvitationsByUserIdPaginated(@PathVariable Long userId,
+            @RequestParam(defaultValue = "0") int pageNumber,
+            @RequestParam(defaultValue = "5") int pageSize
+    ) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+
+        return ResponseEntity.ok(invitationService.getAllInvitationsByUserIdPaginated(userId, pageable));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<InvitationDTO> updateInvitation(@PathVariable Long id, @RequestBody InvitationDTO dto) {
         return ResponseEntity.ok(invitationService.updateInvitation(id, dto));
+    }
+
+    @PatchMapping("/confirm")
+    public ResponseEntity<InvitationDTO> confirmInvitation(@RequestBody InvitationDTO dto) {
+        return ResponseEntity.ok(invitationService.confirmInvitation(dto));
     }
 
     @DeleteMapping("/{id}")

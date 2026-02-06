@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.sicampus.bootcamp2026.dto.InvitationDTO;
 import ru.sicampus.bootcamp2026.entity.Invitation;
+import ru.sicampus.bootcamp2026.entity.User;
 import ru.sicampus.bootcamp2026.exception.InvitationNotFoundException;
 import ru.sicampus.bootcamp2026.exception.MeetingNotFoundException;
 import ru.sicampus.bootcamp2026.exception.UserNotFoundException;
@@ -58,12 +59,37 @@ public class InvitationServiceImpl implements InvitationService {
     }
 
     @Override
+    public List<InvitationDTO> getAllInvitationsByUserId(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        return invitationRepository.findAllByInvitedUser(user).stream()
+                .map(InvitationMapper::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<InvitationDTO> getAllInvitationsByUserIdPaginated(Long id, Pageable pageable) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        return invitationRepository.findByInvitedUser(user, pageable).map(InvitationMapper::convertToDto);
+    }
+
+    @Override
     public InvitationDTO updateInvitation(Long id, InvitationDTO dto) {
         Invitation invitation = invitationRepository.findById(id).orElseThrow(() -> new InvitationNotFoundException("Invitation not found"));
 
         invitation.setInvitedUser(userRepository.findById(dto.getUserId()).orElseThrow(() -> new UserNotFoundException("User not found")));
         invitation.setMeeting(meetingRepository.findById(dto.getMeetingId()).orElseThrow(() -> new MeetingNotFoundException("Meeting not found")));
         invitation.setAccepted(dto.isAccepted());
+
+        return InvitationMapper.convertToDto(invitationRepository.save(invitation));
+    }
+
+    @Override
+    public InvitationDTO confirmInvitation(InvitationDTO dto) {
+        Invitation invitation = invitationRepository.findById(dto.getId()).orElseThrow(() -> new InvitationNotFoundException("Invitation not found"));
+
+        invitation.setAccepted(true);
 
         return InvitationMapper.convertToDto(invitationRepository.save(invitation));
     }

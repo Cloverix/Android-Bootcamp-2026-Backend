@@ -53,9 +53,29 @@ public class MeetingController {
         return ResponseEntity.ok(meetingService.getAllMeetingsByInvitedUserId(id));
     }
 
+    @GetMapping("/invited/paginated/{id}")
+    public ResponseEntity<Page<MeetingDTO>> getAllMeetingsByInvitedUserIdPaginated(@PathVariable long id,
+            @RequestParam(defaultValue = "0") int pageNumber,
+            @RequestParam(defaultValue = "5") int pageSize
+    ) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+
+        return ResponseEntity.ok(meetingService.getAllMeetingsByInvitedUserIdPaginated(id, pageable));
+    }
+
     @GetMapping("/planned/{id}")
     public ResponseEntity<List<MeetingDTO>> getAllPlannedMeetingsByUserId(@PathVariable Long id) {
         return ResponseEntity.ok(meetingService.getAllPlannedMeetingsByUserId(id));
+    }
+
+    @GetMapping("/planned/paginated/{id}")
+    public ResponseEntity<Page<MeetingDTO>> getAllPlannedMeetingsByUserIdPaginated(@PathVariable Long id,
+            @RequestParam(defaultValue = "0") int pageNumber,
+            @RequestParam(defaultValue = "5") int pageSize
+    ) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+
+        return ResponseEntity.ok(meetingService.getAllPlannedMeetingsByUserIdPaginated(id, pageable));
     }
 
     @PutMapping("/{id}")
