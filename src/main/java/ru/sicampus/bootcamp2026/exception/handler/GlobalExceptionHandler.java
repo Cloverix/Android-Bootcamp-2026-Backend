@@ -32,4 +32,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> authorityNotFoundExceptionHandler(AuthorityNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
+
+    @ExceptionHandler(WrongDateFormatException.class)
+    public ResponseEntity<String> wrongDateFormatExceptionHandler(WrongDateFormatException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+    }
 }

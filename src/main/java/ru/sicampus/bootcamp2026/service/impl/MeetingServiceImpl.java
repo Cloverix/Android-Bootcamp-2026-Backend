@@ -1,19 +1,19 @@
 package ru.sicampus.bootcamp2026.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
-import ru.sicampus.bootcamp2026.dto.InvitationDTO;
 import ru.sicampus.bootcamp2026.dto.MeetingDTO;
 import ru.sicampus.bootcamp2026.entity.Invitation;
 import ru.sicampus.bootcamp2026.entity.Meeting;
 import ru.sicampus.bootcamp2026.entity.User;
-import ru.sicampus.bootcamp2026.exception.InvitationNotFoundException;
 import ru.sicampus.bootcamp2026.exception.MeetingNotFoundException;
 import ru.sicampus.bootcamp2026.exception.UserNotFoundException;
+import ru.sicampus.bootcamp2026.exception.WrongDateFormatException;
 import ru.sicampus.bootcamp2026.repository.InvitationRepository;
 import ru.sicampus.bootcamp2026.repository.MeetingRepository;
 import ru.sicampus.bootcamp2026.repository.UserRepository;
@@ -21,7 +21,10 @@ import ru.sicampus.bootcamp2026.service.MeetingService;
 import ru.sicampus.bootcamp2026.util.MeetingMapper;
 import ru.sicampus.bootcamp2026.util.UserMapper;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -121,7 +124,17 @@ public class MeetingServiceImpl implements MeetingService {
             }
         });
 
-        return new PageImpl<>(meetings, pageable, meetings.size());
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), meetings.size());
+
+        List<MeetingDTO> pageContent;
+        if (start >= end) {
+            pageContent = new ArrayList<>();
+        } else {
+            pageContent = meetings.subList(start, end);
+        }
+
+        return new PageImpl<>(pageContent, pageable, meetings.size());
     }
 
     @Override
@@ -155,7 +168,87 @@ public class MeetingServiceImpl implements MeetingService {
             }
         });
 
-        return new PageImpl<>(plannedMeetings, pageable, plannedMeetings.size());
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), plannedMeetings.size());
+
+        List<MeetingDTO> pageContent;
+        if (start >= end) {
+            pageContent = new ArrayList<>();
+        } else {
+            pageContent = plannedMeetings.subList(start, end);
+        }
+
+        return new PageImpl<>(pageContent, pageable, plannedMeetings.size());
+    }
+
+    @Override
+    public Page<MeetingDTO> getAllPlannedMeetingsByUserIdAndDatePaginated(Long id, String dateString, Pageable pageable) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
+        List<MeetingDTO> plannedMeetings = meetingRepository.findAllByCreator(user).stream()
+                .map(MeetingMapper::convertToDto)
+                .collect(Collectors.toList());
+
+        LocalDate filterDate;
+        try {
+            filterDate = LocalDate.parse(dateString);
+        } catch (Exception e) {
+            throw new WrongDateFormatException("Wrong dateString format");
+        }
+
+        List<Invitation> invites = invitationRepository.findAllByInvitedUser(user);
+        invites.forEach(invite -> {
+            Date date = invite.getMeeting().getDate();
+            LocalDate localDate = LocalDate.ofInstant(date.toInstant(), ZoneId.of("UTC"));      //не меняем дату: она уже в правильном часовом поясе
+            if (invite.isAccepted() && localDate.equals(filterDate)) {
+                plannedMeetings.add(MeetingMapper.convertToDto(invite.getMeeting()));
+            }
+        });
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), plannedMeetings.size());
+
+        List<MeetingDTO> pageContent;
+        if (start >= end) {
+            pageContent = new ArrayList<>();
+        } else {
+            pageContent = plannedMeetings.subList(start, end);
+        }
+
+        return new PageImpl<>(pageContent, pageable, plannedMeetings.size());
+    }
+
+    @Override
+    public Page<MeetingDTO> getAllMeetingsByInvitedUserIdAndDatePaginated(Long id, String dateString, Pageable pageable) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        LocalDate filterDate;
+        try {
+            filterDate = LocalDate.parse(dateString);
+        } catch (Exception e) {
+            throw new WrongDateFormatException("Wrong dateString format");
+        }
+
+        List<Invitation> invites = invitationRepository.findAllByInvitedUser(user);
+        List<MeetingDTO> meetings = new ArrayList<>();
+        invites.forEach(invite -> {
+            Date date = invite.getMeeting().getDate();
+            LocalDate localDate = LocalDate.ofInstant(date.toInstant(), ZoneId.of("UTC"));      //не меняем дату: она уже в правильном часовом поясе
+            if (!(invite.isAccepted()) && localDate.equals(filterDate)) {
+                meetings.add(MeetingMapper.convertToDto(invite.getMeeting()));
+            }
+        });
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), meetings.size());
+
+        List<MeetingDTO> pageContent;
+        if (start >= end) {
+            pageContent = new ArrayList<>();
+        } else {
+            pageContent = meetings.subList(start, end);
+        }
+
+        return new PageImpl<>(pageContent, pageable, meetings.size());
     }
 
     @Override

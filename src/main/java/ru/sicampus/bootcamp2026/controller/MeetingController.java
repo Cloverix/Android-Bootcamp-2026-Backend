@@ -53,7 +53,7 @@ public class MeetingController {
         return ResponseEntity.ok(meetingService.getAllMeetingsByInvitedUserId(id));
     }
 
-    @GetMapping("/invited/paginated/{id}")
+    @GetMapping("/invited/paginated/id={id}")
     public ResponseEntity<Page<MeetingDTO>> getAllMeetingsByInvitedUserIdPaginated(@PathVariable long id,
             @RequestParam(defaultValue = "0") int pageNumber,
             @RequestParam(defaultValue = "5") int pageSize
@@ -68,7 +68,7 @@ public class MeetingController {
         return ResponseEntity.ok(meetingService.getAllPlannedMeetingsByUserId(id));
     }
 
-    @GetMapping("/planned/paginated/{id}")
+    @GetMapping("/planned/paginated/id={id}")
     public ResponseEntity<Page<MeetingDTO>> getAllPlannedMeetingsByUserIdPaginated(@PathVariable Long id,
             @RequestParam(defaultValue = "0") int pageNumber,
             @RequestParam(defaultValue = "5") int pageSize
@@ -76,6 +76,28 @@ public class MeetingController {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
         return ResponseEntity.ok(meetingService.getAllPlannedMeetingsByUserIdPaginated(id, pageable));
+    }
+
+    @GetMapping("planned/paginated/by_date/id={id}")
+    public ResponseEntity<Page<MeetingDTO>> getAllPlannedMeetingsByUserIdAndDatePaginated(
+            @PathVariable Long id,
+            @RequestParam String dateString,
+            @RequestParam(defaultValue = "0") int pageNumber,
+            @RequestParam(defaultValue = "5") int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+
+        return ResponseEntity.ok(meetingService.getAllPlannedMeetingsByUserIdAndDatePaginated(id, dateString, pageable));
+    }
+
+    @GetMapping("/invited/paginated/by_date/id={id}")
+    public ResponseEntity<Page<MeetingDTO>> getAllMeetingsByInvitedUserIdAndDatePaginated(
+            @PathVariable Long id,
+            @RequestParam String dateString,
+            @RequestParam(defaultValue = "0") int pageNumber,
+            @RequestParam(defaultValue = "5") int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+
+        return ResponseEntity.ok(meetingService.getAllMeetingsByInvitedUserIdAndDatePaginated(id, dateString, pageable));
     }
 
     @PutMapping("/{id}")

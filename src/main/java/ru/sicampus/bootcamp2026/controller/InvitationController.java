@@ -62,9 +62,9 @@ public class InvitationController {
         return ResponseEntity.ok(invitationService.updateInvitation(id, dto));
     }
 
-    @PatchMapping("/confirm")
-    public ResponseEntity<InvitationDTO> confirmInvitation(@RequestBody InvitationDTO dto) {
-        return ResponseEntity.ok(invitationService.confirmInvitation(dto));
+    @PatchMapping("/confirm/{id}")
+    public ResponseEntity<InvitationDTO> confirmInvitation(@PathVariable Long id) {
+        return ResponseEntity.ok(invitationService.confirmInvitationById(id));
     }
 
     @DeleteMapping("/{id}")

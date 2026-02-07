@@ -21,7 +21,7 @@ public interface InvitationService {
 
     InvitationDTO updateInvitation(Long id, InvitationDTO dto);
 
-    InvitationDTO confirmInvitation(InvitationDTO dto);
+    InvitationDTO confirmInvitationById(Long id);
 
     void deleteInvitation(Long id);
 }

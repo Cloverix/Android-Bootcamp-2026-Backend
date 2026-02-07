@@ -86,8 +86,8 @@ public class InvitationServiceImpl implements InvitationService {
     }
 
     @Override
-    public InvitationDTO confirmInvitation(InvitationDTO dto) {
-        Invitation invitation = invitationRepository.findById(dto.getId()).orElseThrow(() -> new InvitationNotFoundException("Invitation not found"));
+    public InvitationDTO confirmInvitationById(Long id) {
+        Invitation invitation = invitationRepository.findById(id).orElseThrow(() -> new InvitationNotFoundException("Invitation not found"));
 
         invitation.setAccepted(true);
 
