@@ -37,4 +37,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> wrongDateFormatExceptionHandler(WrongDateFormatException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
+
+    @ExceptionHandler(WrongTimeFormatException.class)
+    public ResponseEntity<String> wrongTimeFormatExceptionHandler(WrongTimeFormatException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+    }
 }

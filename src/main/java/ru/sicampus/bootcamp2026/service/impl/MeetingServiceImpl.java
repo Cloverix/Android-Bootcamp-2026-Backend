@@ -14,6 +14,7 @@ import ru.sicampus.bootcamp2026.entity.User;
 import ru.sicampus.bootcamp2026.exception.MeetingNotFoundException;
 import ru.sicampus.bootcamp2026.exception.UserNotFoundException;
 import ru.sicampus.bootcamp2026.exception.WrongDateFormatException;
+import ru.sicampus.bootcamp2026.exception.WrongTimeFormatException;
 import ru.sicampus.bootcamp2026.repository.InvitationRepository;
 import ru.sicampus.bootcamp2026.repository.MeetingRepository;
 import ru.sicampus.bootcamp2026.repository.UserRepository;
@@ -21,12 +22,15 @@ import ru.sicampus.bootcamp2026.service.MeetingService;
 import ru.sicampus.bootcamp2026.util.MeetingMapper;
 import ru.sicampus.bootcamp2026.util.UserMapper;
 
+import java.sql.Time;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Service
@@ -184,9 +188,6 @@ public class MeetingServiceImpl implements MeetingService {
     @Override
     public Page<MeetingDTO> getAllPlannedMeetingsByUserIdAndDatePaginated(Long id, String dateString, Pageable pageable) {
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
-        List<MeetingDTO> plannedMeetings = meetingRepository.findAllByCreator(user).stream()
-                .map(MeetingMapper::convertToDto)
-                .collect(Collectors.toList());
 
         LocalDate filterDate;
         try {
@@ -195,12 +196,78 @@ public class MeetingServiceImpl implements MeetingService {
             throw new WrongDateFormatException("Wrong dateString format");
         }
 
+        List<MeetingDTO> plannedMeetings = new ArrayList<>();
+
+        List<Meeting> createdByUser = meetingRepository.findAllByCreator(user);
+        createdByUser.forEach(meeting -> {
+            Date date = meeting.getDate();
+            LocalDate localDate = LocalDate.ofInstant(date.toInstant(), ZoneId.of("UTC"));      //не меняем дату: она уже в правильном часовом поясе
+            if (localDate.equals(filterDate)) {
+                plannedMeetings.add(MeetingMapper.convertToDto(meeting));
+            }
+        });
+
         List<Invitation> invites = invitationRepository.findAllByInvitedUser(user);
         invites.forEach(invite -> {
-            Date date = invite.getMeeting().getDate();
-            LocalDate localDate = LocalDate.ofInstant(date.toInstant(), ZoneId.of("UTC"));      //не меняем дату: она уже в правильном часовом поясе
+            Date meetingDate = invite.getMeeting().getDate();
+            LocalDate localDate = LocalDate.ofInstant(meetingDate.toInstant(), ZoneId.of("UTC"));      //не меняем дату: она уже в правильном часовом поясе
             if (invite.isAccepted() && localDate.equals(filterDate)) {
                 plannedMeetings.add(MeetingMapper.convertToDto(invite.getMeeting()));
+            }
+        });
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), plannedMeetings.size());
+
+        List<MeetingDTO> pageContent;
+        if (start >= end) {
+            pageContent = new ArrayList<>();
+        } else {
+            pageContent = plannedMeetings.subList(start, end);
+        }
+
+        return new PageImpl<>(pageContent, pageable, plannedMeetings.size());
+    }
+
+    @Override
+    public Page<MeetingDTO> getAllPlannedMeetingsByUserIdAndTimePeriodPaginated(Long id, String dateString, String timePeriodStart, String timePeriodEnd, Pageable pageable) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        LocalDate filterDate;
+        try {
+            filterDate = LocalDate.parse(dateString);
+        } catch (Exception e) {
+            throw new WrongDateFormatException("Wrong dateString format");
+        }
+
+        LocalTime filterStartTime;
+        LocalTime filterEndTime;
+        try {
+            filterStartTime = LocalTime.parse(timePeriodStart);
+            filterEndTime = LocalTime.parse(timePeriodEnd);
+        } catch (Exception e) {
+            throw new WrongTimeFormatException("Wrong timeSting format");
+        }
+
+        List<MeetingDTO> plannedMeetings = new ArrayList<>();
+        List<Meeting> createdByUser = meetingRepository.findAllByCreator(user);
+        createdByUser.forEach(meeting -> {
+            Date meetingDate = meeting.getDate();
+            LocalDate localDate = LocalDate.ofInstant(meetingDate.toInstant(), ZoneId.of("UTC"));
+            LocalTime localTime = meeting.getStartTime().toLocalTime();
+            if (localDate.equals(filterDate) && localTime.compareTo(filterStartTime) >= 0 && localTime.compareTo(filterEndTime) <= 0) {
+                plannedMeetings.add(MeetingMapper.convertToDto(meeting));
+            }
+        });
+
+        List<Invitation> invites = invitationRepository.findAllByInvitedUser(user);
+        invites.forEach(invite -> {
+            Meeting meeting = invite.getMeeting();
+            Date meetingDate = meeting.getDate();
+            LocalDate localDate = LocalDate.ofInstant(meetingDate.toInstant(), ZoneId.of("UTC"));
+            LocalTime localTime = meeting.getStartTime().toLocalTime();
+            if (invite.isAccepted() && localDate.equals(filterDate) && localTime.compareTo(filterStartTime) >= 0 && localTime.compareTo(filterEndTime) <= 0) {
+                plannedMeetings.add(MeetingMapper.convertToDto(meeting));
             }
         });
 
