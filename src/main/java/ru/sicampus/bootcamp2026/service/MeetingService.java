@@ -29,7 +29,7 @@ public interface MeetingService {
 
     Page<MeetingDTO> getAllPlannedMeetingsByUserIdAndDatePaginated(Long id, String dateString, Pageable pageable);
 
-    Page<MeetingDTO> getAllPlannedMeetingsByUserIdAndTimePeriodPaginated(Long id, String dateString, String timePeriodStart, String timePeriodEnd, Pageable pageable);
+    Page<MeetingDTO> getAllPlannedMeetingsByUserIdAndDatePeriodPaginated(Long id, String datePeriodStart, String datePeriodEnd, Pageable pageable);
 
     MeetingDTO updateMeeting(Long id, MeetingDTO dto);
 

@@ -230,23 +230,16 @@ public class MeetingServiceImpl implements MeetingService {
     }
 
     @Override
-    public Page<MeetingDTO> getAllPlannedMeetingsByUserIdAndTimePeriodPaginated(Long id, String dateString, String timePeriodStart, String timePeriodEnd, Pageable pageable) {
+    public Page<MeetingDTO> getAllPlannedMeetingsByUserIdAndDatePeriodPaginated(Long id, String datePeriodStart, String datePeriodEnd, Pageable pageable) {
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        LocalDate filterDate;
+        LocalDate filterStartDate;
+        LocalDate filterEndDate;
         try {
-            filterDate = LocalDate.parse(dateString);
+            filterStartDate = LocalDate.parse(datePeriodStart);
+            filterEndDate = LocalDate.parse(datePeriodEnd);
         } catch (Exception e) {
             throw new WrongDateFormatException("Wrong dateString format");
-        }
-
-        LocalTime filterStartTime;
-        LocalTime filterEndTime;
-        try {
-            filterStartTime = LocalTime.parse(timePeriodStart);
-            filterEndTime = LocalTime.parse(timePeriodEnd);
-        } catch (Exception e) {
-            throw new WrongTimeFormatException("Wrong timeSting format");
         }
 
         List<MeetingDTO> plannedMeetings = new ArrayList<>();
@@ -254,8 +247,7 @@ public class MeetingServiceImpl implements MeetingService {
         createdByUser.forEach(meeting -> {
             Date meetingDate = meeting.getDate();
             LocalDate localDate = LocalDate.ofInstant(meetingDate.toInstant(), ZoneId.of("UTC"));
-            LocalTime localTime = meeting.getStartTime().toLocalTime();
-            if (localDate.equals(filterDate) && localTime.compareTo(filterStartTime) >= 0 && localTime.compareTo(filterEndTime) <= 0) {
+            if (localDate.compareTo(filterStartDate) >= 0 && localDate.compareTo(filterEndDate) <= 0) {
                 plannedMeetings.add(MeetingMapper.convertToDto(meeting));
             }
         });
@@ -265,8 +257,7 @@ public class MeetingServiceImpl implements MeetingService {
             Meeting meeting = invite.getMeeting();
             Date meetingDate = meeting.getDate();
             LocalDate localDate = LocalDate.ofInstant(meetingDate.toInstant(), ZoneId.of("UTC"));
-            LocalTime localTime = meeting.getStartTime().toLocalTime();
-            if (invite.isAccepted() && localDate.equals(filterDate) && localTime.compareTo(filterStartTime) >= 0 && localTime.compareTo(filterEndTime) <= 0) {
+            if (invite.isAccepted() && localDate.compareTo(filterStartDate) >= 0 && localDate.compareTo(filterEndDate) <= 0) {
                 plannedMeetings.add(MeetingMapper.convertToDto(meeting));
             }
         });

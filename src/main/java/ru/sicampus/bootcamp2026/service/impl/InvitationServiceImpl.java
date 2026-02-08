@@ -1,23 +1,30 @@
 package ru.sicampus.bootcamp2026.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.sicampus.bootcamp2026.dto.InvitationDTO;
+import ru.sicampus.bootcamp2026.dto.MeetingDTO;
 import ru.sicampus.bootcamp2026.entity.Invitation;
 import ru.sicampus.bootcamp2026.entity.User;
 import ru.sicampus.bootcamp2026.exception.InvitationNotFoundException;
 import ru.sicampus.bootcamp2026.exception.MeetingNotFoundException;
 import ru.sicampus.bootcamp2026.exception.UserNotFoundException;
+import ru.sicampus.bootcamp2026.exception.WrongDateFormatException;
 import ru.sicampus.bootcamp2026.repository.InvitationRepository;
 import ru.sicampus.bootcamp2026.repository.MeetingRepository;
 import ru.sicampus.bootcamp2026.repository.UserRepository;
 import ru.sicampus.bootcamp2026.service.InvitationService;
 import ru.sicampus.bootcamp2026.util.InvitationMapper;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -86,19 +93,56 @@ public class InvitationServiceImpl implements InvitationService {
     }
 
     @Override
-    public List<InvitationDTO> getAllInvitationsByUserId(Long id) {
+    public List<InvitationDTO> getAllInvitationsByUserId(Long id, String since) {
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
 
+        //LocalDate filterDate = LocalDate.ofInstant(since.toInstant(), ZoneId.of("UTC"));
+        LocalDate filterDate;
+        try {
+            filterDate = LocalDate.parse(since);
+        } catch (Exception e) {
+            throw new WrongDateFormatException("Wrong dateString format");
+        }
+
         return invitationRepository.findAllByInvitedUser(user).stream()
+                .filter(invitation -> LocalDate.ofInstant(invitation.getMeeting().getDate().toInstant(), ZoneId.of("UTC")).compareTo(filterDate) >= 0)
                 .map(InvitationMapper::convertToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
-    public Page<InvitationDTO> getAllInvitationsByUserIdPaginated(Long id, Pageable pageable) {
+    public Page<InvitationDTO> getAllInvitationsByUserIdPaginated(Long id, String since, Pageable pageable) {
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        return invitationRepository.findByInvitedUser(user, pageable).map(InvitationMapper::convertToDto);
+        //LocalDate filterDate = LocalDate.ofInstant(since.toInstant(), ZoneId.of("UTC"));
+
+        LocalDate filterDate;
+        try {
+            filterDate = LocalDate.parse(since);
+        } catch (Exception e) {
+            throw new WrongDateFormatException("Wrong dateString format");
+        }
+
+        List<InvitationDTO> invitations = new ArrayList<>();
+        List<Invitation> allInvites = invitationRepository.findAllByInvitedUser(user);
+        allInvites.forEach(invite -> {
+            LocalDate localDate = LocalDate.ofInstant(invite.getMeeting().getDate().toInstant(), ZoneId.of("UTC"));
+            if (localDate.compareTo(filterDate) >= 0) {
+                invitations.add(InvitationMapper.convertToDto(invite));
+            }
+        });
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), invitations.size());
+
+        List<InvitationDTO> pageContent;
+        if (start >= end) {
+            pageContent = new ArrayList<>();
+        } else {
+            pageContent = invitations.subList(start, end);
+        }
+
+        return new PageImpl<>(pageContent, pageable, invitations.size());
     }
 
     @Override

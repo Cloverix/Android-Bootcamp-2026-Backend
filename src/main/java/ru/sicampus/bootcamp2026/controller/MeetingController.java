@@ -88,17 +88,16 @@ public class MeetingController {
 
         return ResponseEntity.ok(meetingService.getAllPlannedMeetingsByUserIdAndDatePaginated(userId, dateString, pageable));
     }
-    @GetMapping("/planned/paginated/by_date_and_time_period/{userId}")
+    @GetMapping("/planned/paginated/by_date_period/{userId}")
     public ResponseEntity<Page<MeetingDTO>> getAllPlannedMeetingsByUserIdAndTimePeriodPaginated(
             @PathVariable Long userId,
-            @RequestParam String dateString,
-            @RequestParam String timePeriodStart,
-            @RequestParam String timePeriodEnd,
+            @RequestParam String datePeriodStart,
+            @RequestParam String datePeriodEnd,
             @RequestParam(defaultValue = "0") int pageNumber,
             @RequestParam(defaultValue = "5") int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
-        return ResponseEntity.ok(meetingService.getAllPlannedMeetingsByUserIdAndTimePeriodPaginated(userId, dateString, timePeriodStart, timePeriodEnd, pageable));
+        return ResponseEntity.ok(meetingService.getAllPlannedMeetingsByUserIdAndDatePeriodPaginated(userId, datePeriodStart, datePeriodEnd, pageable));
     }
 
     @GetMapping("/invited/paginated/by_date/{userId}")
