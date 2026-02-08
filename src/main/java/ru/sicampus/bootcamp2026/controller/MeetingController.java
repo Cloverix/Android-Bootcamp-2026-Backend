@@ -48,56 +48,56 @@ public class MeetingController {
         return ResponseEntity.ok(meetingService.getAllMeetingsByTitle(title));
     }
 
-    @GetMapping("/invited/{id}")
-    public ResponseEntity<List<MeetingDTO>> getAllMeetingsByInvitedUserId(@PathVariable Long id) {
-        return ResponseEntity.ok(meetingService.getAllMeetingsByInvitedUserId(id));
+    @GetMapping("/invited/{userId}")
+    public ResponseEntity<List<MeetingDTO>> getAllMeetingsByInvitedUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(meetingService.getAllMeetingsByInvitedUserId(userId));
     }
 
-    @GetMapping("/invited/paginated/id={id}")
-    public ResponseEntity<Page<MeetingDTO>> getAllMeetingsByInvitedUserIdPaginated(@PathVariable long id,
+    @GetMapping("/invited/paginated/userId={userId}")
+    public ResponseEntity<Page<MeetingDTO>> getAllMeetingsByInvitedUserIdPaginated(@PathVariable long userId,
             @RequestParam(defaultValue = "0") int pageNumber,
             @RequestParam(defaultValue = "5") int pageSize
     ) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
-        return ResponseEntity.ok(meetingService.getAllMeetingsByInvitedUserIdPaginated(id, pageable));
+        return ResponseEntity.ok(meetingService.getAllMeetingsByInvitedUserIdPaginated(userId, pageable));
     }
 
-    @GetMapping("/planned/{id}")
-    public ResponseEntity<List<MeetingDTO>> getAllPlannedMeetingsByUserId(@PathVariable Long id) {
-        return ResponseEntity.ok(meetingService.getAllPlannedMeetingsByUserId(id));
+    @GetMapping("/planned/{userId}")
+    public ResponseEntity<List<MeetingDTO>> getAllPlannedMeetingsByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(meetingService.getAllPlannedMeetingsByUserId(userId));
     }
 
-    @GetMapping("/planned/paginated/id={id}")
-    public ResponseEntity<Page<MeetingDTO>> getAllPlannedMeetingsByUserIdPaginated(@PathVariable Long id,
+    @GetMapping("/planned/paginated/userId={userId}")
+    public ResponseEntity<Page<MeetingDTO>> getAllPlannedMeetingsByUserIdPaginated(@PathVariable Long userId,
             @RequestParam(defaultValue = "0") int pageNumber,
             @RequestParam(defaultValue = "5") int pageSize
     ) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
-        return ResponseEntity.ok(meetingService.getAllPlannedMeetingsByUserIdPaginated(id, pageable));
+        return ResponseEntity.ok(meetingService.getAllPlannedMeetingsByUserIdPaginated(userId, pageable));
     }
 
-    @GetMapping("planned/paginated/by_date/id={id}")
+    @GetMapping("planned/paginated/by_date/userId={userId}")
     public ResponseEntity<Page<MeetingDTO>> getAllPlannedMeetingsByUserIdAndDatePaginated(
-            @PathVariable Long id,
+            @PathVariable Long userId,
             @RequestParam String dateString,
             @RequestParam(defaultValue = "0") int pageNumber,
             @RequestParam(defaultValue = "5") int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
-        return ResponseEntity.ok(meetingService.getAllPlannedMeetingsByUserIdAndDatePaginated(id, dateString, pageable));
+        return ResponseEntity.ok(meetingService.getAllPlannedMeetingsByUserIdAndDatePaginated(userId, dateString, pageable));
     }
 
-    @GetMapping("/invited/paginated/by_date/id={id}")
+    @GetMapping("/invited/paginated/by_date/userId={userId}")
     public ResponseEntity<Page<MeetingDTO>> getAllMeetingsByInvitedUserIdAndDatePaginated(
-            @PathVariable Long id,
+            @PathVariable Long userId,
             @RequestParam String dateString,
             @RequestParam(defaultValue = "0") int pageNumber,
             @RequestParam(defaultValue = "5") int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
-        return ResponseEntity.ok(meetingService.getAllMeetingsByInvitedUserIdAndDatePaginated(id, dateString, pageable));
+        return ResponseEntity.ok(meetingService.getAllMeetingsByInvitedUserIdAndDatePaginated(userId, dateString, pageable));
     }
 
     @PutMapping("/{id}")

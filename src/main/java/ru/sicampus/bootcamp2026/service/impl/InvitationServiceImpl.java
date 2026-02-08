@@ -2,6 +2,7 @@ package ru.sicampus.bootcamp2026.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.sicampus.bootcamp2026.dto.InvitationDTO;
@@ -16,6 +17,7 @@ import ru.sicampus.bootcamp2026.repository.UserRepository;
 import ru.sicampus.bootcamp2026.service.InvitationService;
 import ru.sicampus.bootcamp2026.util.InvitationMapper;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -56,6 +58,31 @@ public class InvitationServiceImpl implements InvitationService {
     @Override
     public Page<InvitationDTO> getAllInvitationsPaginated(Pageable pageable) {
         return invitationRepository.findAll(pageable).map(InvitationMapper::convertToDto);
+    }
+
+    @Override
+    public Page<InvitationDTO> getAllUnacceptedInvitationsByUserIdPaginated(Long id, Pageable pageable) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        List<InvitationDTO> unacceptedInvites = new ArrayList<>();
+        List<Invitation> invites = invitationRepository.findAllByInvitedUser(user);
+        invites.forEach(invite -> {
+            if (!invite.isAccepted()) {
+                unacceptedInvites.add(InvitationMapper.convertToDto(invite));
+            }
+        });
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), unacceptedInvites.size());
+
+        List<InvitationDTO> pageContent;
+        if (start >= end) {
+            pageContent = new ArrayList<>();
+        } else {
+            pageContent = unacceptedInvites.subList(start, end);
+        }
+
+        return new PageImpl<>(pageContent, pageable, unacceptedInvites.size());
     }
 
     @Override

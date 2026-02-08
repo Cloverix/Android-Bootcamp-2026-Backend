@@ -42,6 +42,17 @@ public class InvitationController {
         return ResponseEntity.ok(invitationService.getAllInvitationsPaginated(pageable));
     }
 
+    @GetMapping("/unaccepted/paginated/userId={userId}")
+    public ResponseEntity<Page<InvitationDTO>> getAllUnacceptedInvitationsByUserIdPaginated(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "0") int pageNumber,
+            @RequestParam(defaultValue = "5") int pageSize
+    ) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+
+        return ResponseEntity.ok(invitationService.getAllUnacceptedInvitationsByUserIdPaginated(userId, pageable));
+    }
+
     @GetMapping("/userId={userId}")
     public ResponseEntity<List<InvitationDTO>> getAllInvitationsByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(invitationService.getAllInvitationsByUserId(userId));

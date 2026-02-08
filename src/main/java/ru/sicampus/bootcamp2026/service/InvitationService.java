@@ -15,6 +15,8 @@ public interface InvitationService {
 
     Page<InvitationDTO> getAllInvitationsPaginated(Pageable pageable);
 
+    Page<InvitationDTO> getAllUnacceptedInvitationsByUserIdPaginated(Long id, Pageable pageable);
+
     List<InvitationDTO> getAllInvitationsByUserId(Long id);
 
     Page<InvitationDTO> getAllInvitationsByUserIdPaginated(Long id, Pageable pageable);
