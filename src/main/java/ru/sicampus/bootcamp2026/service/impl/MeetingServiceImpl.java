@@ -26,10 +26,7 @@ import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
@@ -138,6 +135,8 @@ public class MeetingServiceImpl implements MeetingService {
             pageContent = meetings.subList(start, end);
         }
 
+        pageContent.sort(Comparator.comparing(MeetingDTO::getDate).thenComparing(dto -> dto.getStartTime().toLocalTime()));
+
         return new PageImpl<>(pageContent, pageable, meetings.size());
     }
 
@@ -182,6 +181,8 @@ public class MeetingServiceImpl implements MeetingService {
             pageContent = plannedMeetings.subList(start, end);
         }
 
+        pageContent.sort(Comparator.comparing(MeetingDTO::getDate).thenComparing(dto -> dto.getStartTime().toLocalTime()));
+
         return new PageImpl<>(pageContent, pageable, plannedMeetings.size());
     }
 
@@ -225,6 +226,8 @@ public class MeetingServiceImpl implements MeetingService {
         } else {
             pageContent = plannedMeetings.subList(start, end);
         }
+
+        pageContent.sort(Comparator.comparing(MeetingDTO::getDate).thenComparing(dto -> dto.getStartTime().toLocalTime()));
 
         return new PageImpl<>(pageContent, pageable, plannedMeetings.size());
     }
@@ -272,6 +275,8 @@ public class MeetingServiceImpl implements MeetingService {
             pageContent = plannedMeetings.subList(start, end);
         }
 
+        pageContent.sort(Comparator.comparing(MeetingDTO::getDate).thenComparing(dto -> dto.getStartTime().toLocalTime()));
+
         return new PageImpl<>(pageContent, pageable, plannedMeetings.size());
     }
 
@@ -305,6 +310,8 @@ public class MeetingServiceImpl implements MeetingService {
         } else {
             pageContent = meetings.subList(start, end);
         }
+
+        pageContent.sort(Comparator.comparing(MeetingDTO::getDate).thenComparing(dto -> dto.getStartTime().toLocalTime()));
 
         return new PageImpl<>(pageContent, pageable, meetings.size());
     }
